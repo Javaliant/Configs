@@ -1,7 +1,9 @@
 Function add { subl $profile }
 Function x { exit }
+Function open( $path = '.') { ii $path }
+Function up { cd .. }
 Function rs { shutdown /r /f /t 0 }
-Function open($path = '.') { ii $path }
+
 
 Function sh($time = 0) {
     if ($time -ne 0) {
