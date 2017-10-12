@@ -6,12 +6,10 @@ Function open( $path = '.') { ii $path }
 Function up { cd .. }
 Function rs { shutdown /r /f /t 0 }
 
-
 Function sh($time = 0) {
     if ($time -ne 0) {
         $time *= 60
     }
-
     shutdown /s /f /t $time
 }
 
@@ -23,10 +21,17 @@ Function browse($target) {
     }
 }
 
+Function ghibli { browse https://youtu.be/3jWRrafhO7M?t=1s }
+Function ghiblijazz { browse https://youtu.be/3jWRrafhO7M?t=1s }
+
 Function go($path) {
     if (!(Test-Path $path)) {
         mkdir $path > $null
     }
-
     cd $path
+}
+
+Function notes {
+    $today = Get-Date -Format yyyy/MMM/ddd-dd
+    go C:\work\Notes\$today
 }
