@@ -1,3 +1,5 @@
+Set-PSReadlineOption -BellStyle None
+
 Function add { subl $profile }
 Function x { exit }
 Function open( $path = '.') { ii $path }
