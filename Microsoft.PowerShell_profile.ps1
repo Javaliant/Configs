@@ -35,3 +35,9 @@ Function notes {
     $today = Get-Date -Format yyyy/MMM/ddd-dd
     go C:\work\Notes\$today
 }
+
+Function cleannotes {
+    gci C:\work\Notes -r | ? {$_.PSIsContainer -and `
+    @(gci -Lit $_.Fullname -r | ? {!$_.PSIsContainer}).Length -eq 0} |
+    rm -r
+}
