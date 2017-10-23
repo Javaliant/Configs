@@ -4,7 +4,7 @@ Function add { subl $profile }
 Function x { exit }
 Function open( $path = '.') { ii $path }
 Function up { cd .. }
-Function rs { shutdown /r /f /t 0 }
+Function res { shutdown /r /f /t 0 }
 
 Function sh($time = 0) {
     if ($time -ne 0) {
@@ -34,6 +34,10 @@ Function go($path) {
 Function notes {
     $today = Get-Date -Format yyyy/MMM/ddd-dd
     go C:\work\Notes\$today
+}
+
+Function seenotes {
+    gci C:\work\Notes -r | ? {!$_.PSIsContainer} | Select Directory, Name
 }
 
 Function cleannotes {
