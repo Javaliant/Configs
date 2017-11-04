@@ -1,5 +1,6 @@
 Set-PSReadlineOption -BellStyle None
 
+Function pow { Start-Process powershell }
 Function add { subl $profile }
 Function x { exit }
 Function open( $path = '.') { ii $path }
