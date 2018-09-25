@@ -14,6 +14,10 @@ Function sh($time = 0) {
     shutdown /s /f /t $time
 }
 
+Function rip($time = 0) {
+    sh($time)
+}
+
 Function browse($target) {
     if ($target) {
         Start-Process "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" $target
@@ -21,9 +25,6 @@ Function browse($target) {
         Start-Process "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
     }
 }
-
-Function ghibli { browse https://youtu.be/3jWRrafhO7M?t=1s }
-Function ghiblijazz { browse https://youtu.be/3jWRrafhO7M?t=1s }
 
 Function go($path) {
     if (!(Test-Path $path)) {
@@ -45,4 +46,9 @@ Function cleannotes {
     gci C:\work\Notes -r | ? {$_.PSIsContainer -and `
     @(gci -Lit $_.Fullname -r | ? {!$_.PSIsContainer}).Length -eq 0} |
     rm -r
+}
+
+Function brightness($value = 100) {
+    $monitor = Get-WmiObject -ns root/wmi -class wmiMonitorBrightNessMethods
+    $monitor.WmiSetBrightness(0, $value)
 }
