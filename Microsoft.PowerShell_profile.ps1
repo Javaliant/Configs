@@ -18,12 +18,8 @@ Function rip($time = 0) {
     sh($time)
 }
 
-Function browse($target) {
-    if ($target) {
-        Start-Process "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" $target
-    } else {
-        Start-Process "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
-    }
+Function browse($target = ' ') {
+    Start-Process "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" $target
 }
 
 Function go($path) {
