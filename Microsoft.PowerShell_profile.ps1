@@ -52,3 +52,7 @@ Function brightness($value = 100) {
     $monitor = Get-WmiObject -ns root/wmi -class wmiMonitorBrightNessMethods
     $monitor.WmiSetBrightness(0, $value)
 }
+
+Function query($query, $server = 'MOBILECREATION\SQLEXPRESS') {
+    Invoke-Sqlcmd -Query $query -ServerInstance $server
+}
