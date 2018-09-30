@@ -50,9 +50,9 @@ Function brightness($value = 100) {
 }
 
 Function query($query, $server = '.\SQLEXPRESS') {
-    $serverDefined = Get-Variable 'db' -Scope Global -ErrorAction 'Ignore'
-    if ($serverDefined) {
-        $server = $serverDefined.Value
+    $definedInstance = Get-Variable 'server' -Scope Global -ErrorAction 'Ignore'
+    if ($definedInstance) {
+        $server = $definedInstance.Value
     }
     Invoke-Sqlcmd -Query $query -ServerInstance $server
 }   
