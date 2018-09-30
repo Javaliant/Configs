@@ -49,6 +49,10 @@ Function brightness($value = 100) {
     $monitor.WmiSetBrightness(0, $value)
 }
 
-Function query($query, $server = 'MOBILECREATION\SQLEXPRESS') {
+Function query($query, $server = '.\SQLEXPRESS') {
+    $serverDefined = Get-Variable 'db' -Scope Global -ErrorAction 'Ignore'
+    if ($serverDefined) {
+        $server = $serverDefined.Value
+    }
     Invoke-Sqlcmd -Query $query -ServerInstance $server
-}
+}   
