@@ -49,10 +49,10 @@ Function brightness($value = 100) {
     $monitor.WmiSetBrightness(0, $value)
 }
 
-Function query($query, $server = '.\SQLEXPRESS') {
-    $definedInstance = Get-Variable 'server' -Scope Global -ErrorAction 'Ignore'
-    if ($definedInstance) {
-        $server = $definedInstance.Value
-    }
-    Invoke-Sqlcmd -Query $query -ServerInstance $server
-}   
+Function query($query, $server = '(localdb)\MessagingMiddleware', $database = 'MessageDB') {
+    $definedServer = Get-Variable 'server' -Scope Global -ErrorAction 'Ignore'
+    $definedDatabase = Get-Variable 'database' -Scope Global -ErrorAction 'Ignore'
+    if ($definedServer) { $server = $definedServer.Value }
+    if ($definedDatabase) { $database = $definedDatabase.Value }
+    Invoke-Sqlcmd -Query $query -ServerInstance $server -Database $database
+}
