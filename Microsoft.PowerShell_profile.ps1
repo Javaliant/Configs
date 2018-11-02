@@ -34,14 +34,22 @@ Function notes {
     go C:\work\Notes\$today
 }
 
-Function seenotes {
-    gci C:\work\Notes -r | ? {!$_.PSIsContainer} | Select Directory, Name
+Function seenotes ($name = '') {
+    Get-ChildItem C:\work\Notes -r | Where-Object {!$_.PSIsContainer -and  $_.Name -match $name } | Select-Object Directory, Name
 }
 
 Function cleannotes {
-    gci C:\work\Notes -r | ? {$_.PSIsContainer -and `
-    @(gci -Lit $_.Fullname -r | ? {!$_.PSIsContainer}).Length -eq 0} |
-    rm -r
+    Get-ChildItem C:\work\Notes -r | Where-Object {$_.PSIsContainer -and `
+    @(Get-ChildItem -Lit $_.Fullname -r | Where-Object {!$_.PSIsContainer}).Length -eq 0} |
+    Remove-Item -r
+}
+
+Function viewnotes($name) {
+    Get-ChildItem C:\work\Notes -r | Where-Object {!$_.PSIsContainer -and  $_.Name -match $name } | Invoke-Item
+}
+
+Function delta($alpha, $beta) {
+    Compare-Object (Get-Content $alpha) (Get-Content $beta)
 }
 
 Function brightness($value = 100) {
@@ -55,4 +63,38 @@ Function query($query, $server = '(localdb)\MessagingMiddleware', $database = 'M
     if ($definedServer) { $server = $definedServer.Value }
     if ($definedDatabase) { $database = $definedDatabase.Value }
     Invoke-Sqlcmd -Query $query -ServerInstance $server -Database $database
+}
+
+Function scry($name, [switch] $image = $false) {
+    $name = [uri]::EscapeUriString($name)
+    $content = Invoke-WebRequest "https://api.scryfall.com/cards/named?fuzzy=$name" | ConvertFrom-Json
+    $cardName = $content.name
+    if ($image) {
+        $location = "C:\Personal\Scryfall\$cardName.jpg"
+        if (!(Test-Path $location)) {
+            Invoke-WebRequest $content.image_uris.normal -OutFile $location
+        }
+        view($location)
+    } else {
+        Write-Host $content.oracle_text
+    }
+}
+
+Function view($file) {
+    [void][reflection.assembly]::LoadWithPartialName("System.Windows.Forms")
+    $img = [System.Drawing.Image]::Fromfile($file);
+
+    [System.Windows.Forms.Application]::EnableVisualStyles();
+    $form = new-object Windows.Forms.Form
+    $form.Text = "Image Viewer"
+    $form.Width = $img.Size.Width;
+    $form.Height =  $img.Size.Height;
+    $pictureBox = new-object Windows.Forms.PictureBox
+    $pictureBox.Width =  $img.Size.Width;
+    $pictureBox.Height =  $img.Size.Height;
+
+    $pictureBox.Image = $img;
+    $form.controls.add($pictureBox)
+    $form.Add_Shown( { $form.Activate() } )
+    $form.ShowDialog()
 }
