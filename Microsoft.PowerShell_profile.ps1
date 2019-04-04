@@ -1,5 +1,4 @@
-#Set-PSReadlineOption -BellStyle None
-# Add-Type -path C:\Users\lvincent\Documents\WindowsPowerShell\VolumeControl.cs 
+Set-PSReadlineOption -BellStyle None
 
 Add-Type -AssemblyName System.speech
 $speechSynth = New-Object System.Speech.Synthesis.SpeechSynthesizer
@@ -10,13 +9,6 @@ Function x { exit }
 Function open( $path = '.') { Invoke-Item $path }
 Function up { Set-Location .. }
 Function res { shutdown /r /f /t 0 }
-
-Function sh($time = 0) {
-    if ($time -ne 0) {
-        $time *= 60
-    }
-    shutdown /s /f /t $time
-}
 
 Function rip($time = 0) {
     if ($time -ne 0) {
