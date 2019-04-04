@@ -17,13 +17,8 @@ Function rip($time = 0) {
     shutdown /s /f /t $time
 }
 
-Function browse($target) {
-    if ($target) {
-        Start-Process "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" $target
-    } else {
-        Start-Process "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
-    }
-}
+Function browse($target = ' ') { Start-Process "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" $target }
+
 
 Function ghibli { browse https://www.youtube.com/watch?v=9YNws6yE9Ns=1s }
 Function ghiblijazz { browse https://youtu.be/3jWRrafhO7M?t=1s }
