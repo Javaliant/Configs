@@ -11,61 +11,84 @@ Function up { Set-Location .. }
 Function res { shutdown /r /f /t 0 }
 
 Function rip($time = 0) {
-    if ($time -ne 0) {
-        $time *= 60
-    }
+    if ($time -ne 0) { $time *= 60 }
     shutdown /s /f /t $time
 }
 
-Function browse($target = ' ') { Start-Process "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" $target }
+Function sh($time = 0) { rip $time }
 
-
-Function ghibli { browse https://www.youtube.com/watch?v=9YNws6yE9Ns=1s }
-Function ghiblijazz { browse https://youtu.be/3jWRrafhO7M?t=1s }
+Function browse($target = ' ') {
+    Start-Process "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" $target
+}
 
 Function go($path) {
-    if (!(Test-Path $path)) {
-        mkdir $path > $null
-    }
+    if (!(Test-Path $path)) { mkdir $path > $null }
     Set-Location $path
 }
 
-Function notes {
-    $today = Get-Date -Format yyyy/MMM/ddd-dd
-    go C:\Notes\$today
+Function Notes($title) {
+    if ($title) {
+        $today = Get-Date -Format MM/dd/yyyy
+        $template = "$title`n=`n###### $today`n"
+        $path = "C:\Notes\$title.md"
+        Set-Content -Path $path -Value $template
+        code $path
+    } else {
+        go C:\Notes\
+    }
 }
 
-Function seenotes ($name = '') {
-    Get-ChildItem C:\Notes -r | Where-Object {!$_.PSIsContainer -and  $_.Name -match $name } | Select-Object Directory, Name
+Function SearchNotes($tag, [switch] $archive) {
+    # For both view and search notes, consider facility to search tag combinations
+    # Would it be useful to list the tags present in each file?
+    if ($archive) {
+        Get-ChildItem C:\Notes, C:\Notes\Archive | Select-String -Pattern "``$tag``" -SimpleMatch | Select-Object Path
+    } else {
+        Get-ChildItem C:\Notes | Select-String -Pattern "``$tag``" -SimpleMatch | Select-Object Filename
+    }
 }
 
-Function cleannotes {
-    Get-ChildItem C:\Notes -r | Where-Object {$_.PSIsContainer -and `
-    @(Get-ChildItem -Lit $_.Fullname -r | Where-Object {!$_.PSIsContainer}).Length -eq 0} |
-    Remove-Item -r
+Function ViewNotes($tag, [switch] $archive) {
+    if ($archive) {
+        Get-ChildItem C:\Notes, C:\Notes\Archive | Select-String -Pattern "``$tag``" -SimpleMatch | ForEach-Object { code $_.Path }
+    } else {
+        Get-ChildItem C:\Notes | Select-String -Pattern "``$tag``" -SimpleMatch | ForEach-Object { code $_.Path }
+    }
 }
 
-Function viewnotes([Parameter(Mandatory=$true)] $name) {
-    Get-ChildItem C:\work\Notes -r | Where-Object {!$_.PSIsContainer -and  $_.Name -match $name } | Invoke-Item
+Function ArchiveNotes() {
+    # TODO
+    # By default move anything older than 6 months to the archive folder
+    # Have a time parameter to be able to specify how old it should be otherwise
+    # Possibly 
 }
 
-Function delta($alpha, $beta) {
+Function Transcribe($name = '') {
+    if ($name -eq '') { $name = Get-Date -Format ddd-dd }
+    Start-Transcript -Path "C:\Notes\Transcript_$name.txt"
+}
+
+Function Stop {
+    Stop-Transcript
+}
+
+Function Delta($alpha, $beta) {
     Compare-Object (Get-Content $alpha) (Get-Content $beta)
 }
 
-Function brightness($value = 100) {
+Function Brightness($value = 100) {
     $monitor = Get-WmiObject -ns root/wmi -class wmiMonitorBrightNessMethods
     $monitor.WmiSetBrightness(0, $value)
 }
 
-Function query($query, $server = '(localdb)\GMW', $database = 'MessageDB') {
+Function Query($query, $server = '(localdb)\Personal', $database = 'POC') {
     $definedServer = Get-Variable 'server' -Scope Global -ErrorAction 'Ignore'
     $definedDatabase = Get-Variable 'database' -Scope Global -ErrorAction 'Ignore'
     if ($definedServer) { $server = $definedServer.Value }
     if ($definedDatabase) { $database = $definedDatabase.Value }
     Invoke-Sqlcmd -Query $query -ServerInstance $server -Database $database
 }
-
+ 
 Function view($file) {
     [void][reflection.assembly]::LoadWithPartialName("System.Windows.Forms")
     $img = [System.Drawing.Image]::Fromfile($file);
@@ -113,3 +136,8 @@ Function Window($width = 0, $height = 0) {
 Function Speak($phrase) {
     $speechSynth.Speak($phrase)
 }
+
+
+Function searchgroups { rundll32 dsquery OpenQueryWindow }
+
+Function CreateLocalDb($name) { sqllocaldb create $name }
