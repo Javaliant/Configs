@@ -15,8 +15,6 @@ Function rip($time = 0) {
     shutdown /s /f /t $time
 }
 
-Function sh($time = 0) { rip $time }
-
 Function browse($target = ' ') {
     Start-Process "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" $target
 }
@@ -28,14 +26,27 @@ Function go($path) {
 
 Function Notes($title) {
     if ($title) {
+        $header = MakeHeader($title)
         $today = Get-Date -Format MM/dd/yyyy
-        $template = "$title`n=`n###### $today`n"
+        $template = "$header`n=`n###### $today`n"
         $path = "C:\Notes\$title.md"
         Set-Content -Path $path -Value $template
         code $path
     } else {
         go C:\Notes\
     }
+}
+
+Function MakeHeader($title) {
+    $header = ""
+    foreach($c in $title.toCharArray()) {
+        if ($c -cmatch "\d|[A-Z]") {
+            $header += " $c"
+        } else {
+            $header += $c
+        }
+    }
+    return $header.substring(1)
 }
 
 Function SearchNotes($tag, [switch] $archive) {
@@ -56,12 +67,12 @@ Function ViewNotes($tag, [switch] $archive) {
     }
 }
 
-Function ArchiveNotes() {
+# Function ArchiveNotes() {
     # TODO
     # By default move anything older than 6 months to the archive folder
     # Have a time parameter to be able to specify how old it should be otherwise
     # Possibly 
-}
+# }
 
 Function Transcribe($name = '') {
     if ($name -eq '') { $name = Get-Date -Format ddd-dd }
@@ -137,7 +148,10 @@ Function Speak($phrase) {
     $speechSynth.Speak($phrase)
 }
 
-
 Function searchgroups { rundll32 dsquery OpenQueryWindow }
 
 Function CreateLocalDb($name) { sqllocaldb create $name }
+
+Function rebcheck {
+    Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending'
+}
