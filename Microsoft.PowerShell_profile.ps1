@@ -19,6 +19,10 @@ Function browse($target = ' ') {
     Start-Process "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" $target
 }
 
+Function Tasks {
+    Start-Process "C:\Program Files\BGInfo\Bginfo64.exe"
+}
+
 Function go($path) {
     if (!(Test-Path $path)) { mkdir $path > $null }
     Set-Location $path
@@ -92,6 +96,10 @@ Function Brightness($value = 100) {
     $monitor.WmiSetBrightness(0, $value)
 }
 
+Function bright { Brightness 100 }
+
+Function dim { Brightness 0 }
+
 Function Query($query, $server = '(localdb)\Personal', $database = 'POC') {
     $definedServer = Get-Variable 'server' -Scope Global -ErrorAction 'Ignore'
     $definedDatabase = Get-Variable 'database' -Scope Global -ErrorAction 'Ignore'
@@ -155,3 +163,13 @@ Function CreateLocalDb($name) { sqllocaldb create $name }
 Function rebcheck {
     Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending'
 }
+
+# Chocolatey profile
+$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+if (Test-Path($ChocolateyProfile)) {
+  Import-Module "$ChocolateyProfile"
+}
+
+Function raspi { putty -ssh pi@192.168.0.26 -pw }
+
+Function nraspi { putty -ssh pi@ -pw }
